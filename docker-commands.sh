@@ -1,4 +1,6 @@
 
+#----------------------------------------------------------------------------------------
+
 # This will run an image from a container.
 docker run <image>
 
@@ -22,15 +24,20 @@ docker ps -a
 # You can set your own contianer-name by using the "--name" flag
 sudo docker run --name Thanos_of_2019 docker/whalesay cowsay Im-Inevitable! 
 
+# TAG
 # You can also specify the version of image to run in case
 # you have multiple versions of an image by specifying "image:version"
 # This is called the TAG.
 # In this example, we'll pull down two versions of nginx.
 sudo docker nginx
 sudo docker nginx:1.14-alpine
+
 # To run a container from the 1.14-alpine image and 
 # set container-name to nginx-2
 sudo docker run -d --name nginx-2 nginx:1.14-alpine
+
+# To know all the available tags for an image, look for the image in dockerhub.com
+# and you'll find all the supported tags there.
 
 # You can run multiple isntances/containers from the same image
 sudo docker run docker/whalesay cowsay Infinity-and-beyond!
@@ -55,7 +62,7 @@ docker images
 # If the first 2 or 3 digits of the container-id is unique, 
 # docker will immediately know which container you want to stop.
 docker stop <silly-name>
-docher stop <container-id
+docker stop <container-id>
 
 # This removes the container permanently.
 # List all containers afterwards to check
@@ -95,6 +102,8 @@ sudo docker ps
 sudo docker exec <container-id> cat /etc/hosts
 sudo docker exec <silly-name> cat /etc/hosts
 
+#----------------------------------------------------------------------------------------
+
 # ATTACH MODE
 # You can run a container is an ATTACH mode - this means process will run in the foreground.
 # you cannot do anything else while process is attached to the console until container exits.
@@ -119,4 +128,75 @@ sudo docker attach <container-id>
 sudo docker attach <silly-name>
 
 # You can also run and automatically log in to the container by using the "-it" flag.
-sudo docker run -it -d --rm --name nyancat2 06kellyjac/nyancat
+sudo docker run -it -d --name nyancat2 06kellyjac/nyancat
+
+#----------------------------------------------------------------------------------------
+
+# INPUTS
+
+# By default, a docker container doesn't listen to standard input.
+# It runs in a non-interactive shell.
+# You can map the standard input of your host to the docker container using the "-i" flag.
+# You can also map your terminal to the container's terminal by using the "-t" flag
+# "-i"  - interactive
+# "-t"  - terminal
+
+# As an example, we can use a simple image of an app that promps user for its name.
+docker pull kodekloud/simple-prompt-docker
+docker run -it kodekloud/simple-prompt-docker
+
+#----------------------------------------------------------------------------------------
+
+# PORT MAPPING
+
+# Recall that the underlying host (your machine) where docker is installed is called 
+# DOCKER HOST or DOCKER ENGINE
+# If you want to access your app in the container through a web browser, you can use the 
+# container's IP, but note that this is an internal IP is only accessible from the host itself.
+# Note also that users outside the host cannot access this IP.
+
+# To get the IP address;
+docker ps
+docker inspect <container-id>
+
+# To access the ip from within the host, you can open the ip address in a browser in the host.
+# You can also do a curl in the host's terminal
+# Note that 8080 is the default port of the container
+curl <ip-of-vm>:8080
+
+# You can also use the IP of the docker host, but you need to map the port inside the container
+# to the free port inside the docker host.
+# We can use the "-p" flag to map the ports
+
+# As an example, we can use to map container port 5000 to host port 80
+docker run -d -p 80:8080 kodekloud/simple-webapp
+
+# To see the port mappings in your linux machine:
+netstat -tulpn
+
+#----------------------------------------------------------------------------------------
+
+# DATA PERSISTENCE
+
+# If you have a database inside the container, the data in it will be lost as soon as the
+# container exist or is removed. If you want to persist data, 
+# you can map a directory (in the container) to another directory(in the docker host)
+# you can use the "-v" flag, followed by the directory mappings
+# "-v"  - volume mapping
+docker run -v <host-dir>:<container-dir> <image>
+
+# As an example, I have created a /opt/mysqldir in my linux machine
+# and then mapped it to the default mysql directory inside the container.
+docker run -v /opt/mysqldir:/var/lib/mysql mysql
+
+#----------------------------------------------------------------------------------------
+
+# LOGS
+
+# To see the logs, you can simply use the logs command
+docker ps
+docker logs <container-id>
+
+#----------------------------------------------------------------------------------------
+
+
