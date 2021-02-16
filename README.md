@@ -7,5 +7,5 @@ It's still at an early stage, but this one's one of the goals I have on my list 
 Going full steam ahead.
 
 <p align=center>
-    <img src="Images/docker-6.jpg" width=500>
+    <img src="0-Images/docker-6.jpg" width=500>
 </p>
