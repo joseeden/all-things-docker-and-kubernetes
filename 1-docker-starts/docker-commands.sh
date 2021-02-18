@@ -199,4 +199,81 @@ docker logs <container-id>
 
 #----------------------------------------------------------------------------------------
 
+# ENVIRONMENT VARIABLES
 
+
+# We can specify an environment variable which we can use in a given code.
+# This is useful when we don't want to modify the code and instead use variables
+# for any values that we need to change in the code
+
+# As an example, we have color-message.py which display a message on 
+# backgroudn color which we can change
+
+```python
+# color-message.py
+import os
+from flask import Flask
+
+app = Flask(__name__)
+
+color= os.environ.get(APP_COLOR)
+
+@app.route("/")
+def main():
+    print(color)
+    return render_template('hello.html', color=color)
+
+if __name__="__main__":
+    app.run(host="0.0.0.0", port="8080")
+```
+
+# To run this image with an environment variable, use the -e flag
+# followed by variabel
+docker run -e APP_COLOR=blue simple-webapp-color
+
+#----------------------------------------------------------------------------------------
+
+# CMD and ENTRYPOINT
+
+# Recall that containers are not meant to host operating systems.
+# Thus when you launch a container of a Linux Image, liek Ubuntu,
+# it's default command or CMD is bash - this can be seen from the dockerfile itself
+# however, if it doesn't detect any terminal, it just stops the process,
+# which also stops the container.
+
+# If you want to define a command or instruction to run besides the bash when the
+# container is ran, you can specify it in the dockerfile using the CMD keyword.
+
+# As an example, we can set the container to sleep for 60 seconds when it is ran by:
+docker run ubuntu sleep 60
+
+# An easier way to do this is by including the command itself in the dockerfile
+FROM ubuntu
+
+CMD sleep 60
+
+# These are the ways to specify a command in the dockerfile
+CMD <command> <parameter1>
+CMD ["<command>", "<parameter1>"]                   <<< JSON format
+
+# We can also use a parameter from the commandline itself
+# This can be done by using ENTRYPOINT in the dockerfile
+FROM ubuntu
+
+ENTRYPOINT ["sleep"]
+# Now when you run the container, you'll just have to define the parameter
+docker run ubuntu-sleeper 60
+
+# Note that you'll get an error when you don't append a parameter in the
+# docker run command because the ENTRYPOINT is expecting a parameter
+# To include a default value in case user doesn't provide a parameter
+# along with the docker run command, you can use CMD and ENTRYPOINT together
+FROM ubuntu
+
+ENTRYPOINT ["sleep"]
+
+CMD ["60"]
+
+# You can also override the entrypoint during runtime by using the
+# "--entrypoint" flag
+docker run --entrypoint sleep2.0 ubuntu-sleeper 60
